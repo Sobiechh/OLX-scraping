@@ -43,13 +43,11 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
             prices.append(float(infos[3].get_text().split(' ')[0].strip())) #price/m^2
             
             #if main info contains word's like electricity', 'water', 'gas', 'media', 'armed' means that is medialised
-            if media_on == True:
-                if any(med in soup.find(class_='clr lheight20 large').get_text() for med in ['prad','woda', 'gaz', 'media', 'uzbrojona']):
-                    descriptions.append('Tak')
-                else:
-                    descriptions.append('Nie')
-            else: #if not append no
-                descriptions.append('Nie')
+
+            if any(med in soup.find(class_='clr lheight20 large').get_text() for med in ['prad','woda', 'gaz', 'media', 'uzbrojona']):
+                descriptions.append('Tak')
+            else:
+                descriptions.append('Nie') # to del
             
             localizations.append(soup.find(class_='offer-user__address').p.get_text().split(',')[-1].strip()) # exact location
 
@@ -62,6 +60,12 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
         'Media': descriptions,
         'Lokalizacja':localizations
     })
+
+    #if we want to find plot with media
+    if media_on == True: 
+        data_from_sites = data_from_sites[data_from_sites['Media'] != 'Nie']
+    else: #if we want to find plot without media
+        data_from_sites = data_from_sites[data_from_sites['Media'] != 'Tak']
 
     now = dt.datetime.now() #datetime.now to .xslx file
     now = now.strftime("Dane Data %d_%m_%Y Godzina %H_%M_%S") # : <- forbidden in file save
