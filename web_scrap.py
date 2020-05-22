@@ -1,48 +1,10 @@
-import re
-import pandas as pd
-import requests
-from boto.support import regions
-from bs4 import BeautifulSoup
-import datetime as dt
-
-#region
-regions = ['Aleksandrow-Lodzki',
-'Belchatow              ',
-'Glowno                 ',
-'Konstantynow-Lodzki    ', 
-'Kutno                  ', 
-'Lask                   ', 
-'Leczyca                ', 
-'Lodz                   ',
-'Lowicz                 ', 
-'Opoczno                ', 
-'Ozorkow                ',
-'Pabianice              ', 
-'Piotrkow-Trybunalski   ', 
-'Radomsko               ',
-'Rawa-Mazowiecka        ', 
-'Sieradz                ',
-'Skierniewice           ', 
-'Tomaszow-Mazowiecki    ', 
-'Wielun                 ',
-'Zdunska-Wola           ',    
-'Zgierz                 ']
-
-#localization
-loc = 'Lodz'
+import pandas as pd #dataframe
+import requests #html request
+from bs4 import BeautifulSoup #scrap page
+import datetime as dt #to save file xslx
 
 
-#surface
-surface_min= 1000
-surface_max= 5000
-
-#seller priv/company
-temp = ['private','business']
-seller = 'private'
-
-media_on = True
-
-def scrap_OLX(loc, surface_min, surface_max, seller, median_on):
+def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     dealers, surfaces, prices, descriptions, localizations = [], [], [], [], []#tables to dataframe
 
     page = requests.get(f'https://www.olx.pl/nieruchomosci/dzialki/{loc}/?search%5Bfilter_float_m%3Afrom%5D={surface_min}&search%5Bfilter_float_m%3Ato%5D={surface_max}&search%5Bprivate_business%5D={seller}')
@@ -76,7 +38,7 @@ def scrap_OLX(loc, surface_min, surface_max, seller, median_on):
             #tables to dataframe
             dealers.append(infos[0].get_text().strip()) # private/buissness
 
-            surfaces.append(float(''.join(infos[2].get_text().split(' ')[:2]).strip())) #size of the surface
+            surfaces.append((''.join(infos[2].get_text().split(' ')[:-1]).strip())) #size of the surface
 
             prices.append(float(infos[3].get_text().split(' ')[0].strip())) #price/m^2
             
@@ -101,12 +63,8 @@ def scrap_OLX(loc, surface_min, surface_max, seller, median_on):
         'Lokalizacja':localizations
     })
 
-    #tests
-
-    now = dt.datetime.now() #datetime now to .xslx file
+    now = dt.datetime.now() #datetime.now to .xslx file
     now = now.strftime("Dane Data %d_%m_%Y Godzina %H_%M_%S") # : <- forbidden in file save
     data_from_sites.sort_values(by='Lokalizacja').to_excel(f'data/{loc}_{now}.xlsx')
     
-    return f'TO WSZYSTKO Z {loc} SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2 TO: {round(sum(prices)/len(prices),2)}zł/m^2')
-
-scrap_OLX(loc, surface_min, surface_max, seller, media_on)
+    return f'TO WSZYSTKO Z {loc} SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2 TO: {round(sum(prices)/len(prices),2)}zł/m^2'
