@@ -67,4 +67,4 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     now = now.strftime("Dane Data %d_%m_%Y Godzina %H_%M_%S") # : <- forbidden in file save
     data_from_sites.sort_values(by='Lokalizacja').to_excel(f'data/{loc}_{now}.xlsx')
     
-    return f'TO WSZYSTKO Z {loc} SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2 TO: {round(sum(prices)/len(prices),2)}zł/m^2'
+    return f'{loc} SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2 TO: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'

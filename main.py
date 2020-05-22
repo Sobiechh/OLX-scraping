@@ -8,7 +8,7 @@ def print_average_value():
 #tkinter initial window
 window = tk.Tk() #window
 window.title('OLX Projekt') #Set title
-window.geometry('800x400') #Set geometry
+#window.geometry('800x400') #Set geometry
 
 #surfaces menu
 surfaces = [100, 300,500,800,1000,1500]
@@ -17,12 +17,16 @@ surfaces.extend([x for x in range(2000, 5001,1000)])
 surface_min = tk.IntVar() #var surface minimum
 surface_max = tk.IntVar() #var surface maximum
 
-tk.OptionMenu(window, surface_min, *surfaces).pack() #option menu surface_min
-tk.OptionMenu(window, surface_max, *surfaces).pack() #option menu surface_max
+tk.Label(window, text='Powierzchnia dzialki m^2').grid(row=0, column =0, sticky = tk.W)
 
+t1 = tk.OptionMenu(window, surface_min, *surfaces) #option menu surface_min
+t2 = tk.OptionMenu(window, surface_max, *surfaces) #option menu surface_max
+
+t1.grid(row=1, column =0, sticky = tk.W)
+t2.grid(row=1, column =0, sticky = tk.E)
 
 media_on = tk.BooleanVar() #boolen value for media
-tk.Checkbutton(window, text='Media',variable=media_on, onvalue=True, offvalue=False).pack()
+tk.Checkbutton(window, text='Media',variable=media_on, onvalue=True, offvalue=False).grid(row=2, column =0)
 
 #cities read with image_read
 regions = [
@@ -53,7 +57,8 @@ regions = [region.strip() for region in regions] #strip them all
 region_var = tk.StringVar() 
 region_var.set("Lodz")
 
-tk.OptionMenu(window, region_var, *regions).pack() #option menu cities
+tk.Label(text='Lokalizacja').grid(row=3, column =0, sticky=tk.W)
+tk.OptionMenu(window, region_var, *regions).grid(row=3, column =0, sticky=tk.W) #option menu cities
 
 #dealers
 dealers = [
@@ -65,17 +70,18 @@ dealers = [
 var_dealer = tk.StringVar()
 var_dealer.set("") # initialize
 
+i=4
 for text, mode in dealers:
-    b = tk.Radiobutton(window, text=text,
-                    variable=var_dealer, value=mode)
-    b.pack()
+    b = tk.Radiobutton(window, text=text, variable=var_dealer, value=mode)
+    b.grid(row=i,column=0, sticky = tk.W)
+    i+=1
 
 #button
-tk.Button(window, text ="Hello", command = print_average_value).pack()
+tk.Button(window, text ="Oblicz", command = print_average_value).grid(row=7, column =0, sticky = tk.W)
 
 #result
-label = tk.Label(window, bg='white', width=200, text='') #set parametr
-label.pack()
+label = tk.Label(window, bg='white', width=50, text='') #set parametr
+label.grid(row=8, column = 0, sticky = tk.W)
 
 
 window.mainloop() #starting application
