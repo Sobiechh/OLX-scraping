@@ -67,8 +67,10 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     else: #if we want to find plot without media
         data_from_sites = data_from_sites[data_from_sites['Media'] != 'Tak']
 
+    prices = data_from_sites['Cena za m^2'].to_list() #we need this because we deleted rows with/without media se we need to calculate new averange prices
+
     now = dt.datetime.now() #datetime.now to .xslx file
     now = now.strftime("Dane Data %d_%m_%Y Godzina %H_%M_%S") # : <- forbidden in file save
     data_from_sites.sort_values(by='Lokalizacja').to_excel(f'data/{loc}_{now}.xlsx')
     
-    return f'{loc} SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2 TO: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
+    return f'{loc}\n SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2\n  WYNOSI: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
