@@ -7,7 +7,10 @@ import datetime as dt #to save file xslx
 def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     dealers, surfaces, prices, descriptions, localizations = [], [], [], [], []#tables to dataframe
 
-    page = requests.get(f'https://www.olx.pl/nieruchomosci/dzialki/{loc}/?search%5Bfilter_float_m%3Afrom%5D={surface_min}&search%5Bfilter_float_m%3Ato%5D={surface_max}&search%5Bprivate_business%5D={seller}')
+    if surface_min>surface_max:
+        return 'ŹLE PODANE WARTOŚCI\nPROSZĘ WPROWADZIĆ JESZCZE RAZ'
+
+    page = requests.get(f'https://www.olx.pl/nieruchomosci/dzialki/{loc}/?search[filter_enum_type][0]=dzialki-budowlane&search%5Bfilter_float_m%3Afrom%5D={surface_min}&search%5Bfilter_float_m%3Ato%5D={surface_max}&search%5Bprivate_business%5D={seller}')
     soup = BeautifulSoup(page.content, 'html.parser')
 
     num_of_sites = soup.find_all(class_ = 'block br3 brc8 large tdnone lheight24') #info about num of pages

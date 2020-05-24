@@ -3,7 +3,7 @@ from web_scrap import scrap_OLX #second file
 
 #result of program
 def print_average_value(): 
-    label.config(text=f'{scrap_OLX(region_var.get(), surface_min.get(), surface_max.get(), var_dealer.get(), media_on.get())}')
+    label.config(text=f'{scrap_OLX(regions[region_var.get()], surface_min.get(), surface_max.get(), var_dealer.get(), media_on.get())}')
 
 #tkinter initial window
 window = tk.Tk() #window
@@ -12,7 +12,8 @@ window.title('OLX Projekt') #Set title
 
 #surfaces menu
 surfaces = [100, 300,500,800,1000,1500]
-surfaces.extend([x for x in range(2000, 5001,1000)])
+surfaces.extend([x for x in range(2000, 10001,1000)])
+surfaces.append(25000)
 
 surface_min = tk.IntVar() #var surface minimum
 surface_max = tk.IntVar() #var surface maximum
@@ -28,39 +29,40 @@ t1.grid(row=2, column =0, sticky = tk.W)
 t2.grid(row=2, column =0, sticky = tk.E)
 
 media_on = tk.BooleanVar() #boolen value for media
-tk.Checkbutton(window, text='Media',variable=media_on, onvalue=True, offvalue=False).grid(row=3, column =0)
+tk.Checkbutton(window, text='Media',variable=media_on, onvalue=True, offvalue=False).grid(row=3, column =0) #checkbutton
 
 #cities read with image_read
-regions = [
-'Aleksandrow-Lodzki     ',
-'Belchatow              ',
-'Glowno                 ',
-'Konstantynow-Lodzki    ', 
-'Kutno                  ', 
-'Lask                   ', 
-'Leczyca                ', 
-'Lodz                   ',
-'Lowicz                 ', 
-'Opoczno                ', 
-'Ozorkow                ',
-'Pabianice              ', 
-'Piotrkow-Trybunalski   ', 
-'Radomsko               ',
-'Rawa-Mazowiecka        ', 
-'Sieradz                ',
-'Skierniewice           ', 
-'Tomaszow-Mazowiecki    ', 
-'Wielun                 ',
-'Zdunska-Wola           ',    
-'Zgierz                 ']
-regions = [region.strip() for region in regions] #strip them all
+regions = {
+    'Aleksandrów Łódzki':'Aleksandrow-Lodzki',
+    'Bełchatów':'Belchatow',
+    'Głowno':'Glowno',
+    'Konstantynów Łódzki':'Konstantynow-Lodzki', 
+    'Kutno':'Kutno', 
+    'Łask':'Lask', 
+    'Łęczyca':'Leczyca', 
+    'Łódź':'Lodz',
+    'Łowicz':'Lowicz', 
+    'Opoczno':'Opoczno', 
+    'Ozorków':'Ozorkow',
+    'Pabianice':'Pabianice', 
+    'Piotrków Trybunalski':'Piotrkow-Trybunalski', 
+    'Radomsko':'Radomsko',
+    'Rawa Mazowiecka':'Rawa-Mazowiecka', 
+    'Sieradz':'Sieradz',
+    'Skierniewice':'Skierniewice', 
+    'Tomaszów Mazowiecki':'Tomaszow-Mazowiecki', 
+    'Wielun':'Wielun',
+    'Zduńska Wola':'Zdunska-Wola',    
+    'Zgierz':'Zgierz'
+    }
 
 #set default value of option menu
 region_var = tk.StringVar() 
-region_var.set("Lodz")
+region_var.set("Łódź")
 
+#label localization
 tk.Label(text='Lokalizacja').grid(row=4, column =0, sticky=tk.W)
-tk.OptionMenu(window, region_var, *regions).grid(row=4, column =0, sticky=tk.W) #option menu cities
+tk.OptionMenu(window, region_var, *regions.keys()).grid(row=4, column =0, sticky=tk.W) #option menu cities
 
 #dealers
 dealers = [
