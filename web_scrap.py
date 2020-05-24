@@ -5,13 +5,17 @@ import datetime as dt #to save file xslx
 
 
 def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
-    dealers, surfaces, prices, descriptions, localizations = [], [], [], [], []#tables to dataframe
+    dealers, surfaces, prices, descriptions, localizations, links = [], [], [], [], [], []#tables to dataframe
 
+    #check surface min/max bug
     if surface_min>surface_max:
         return 'ŹLE PODANE WARTOŚCI\nPROSZĘ WPROWADZIĆ JESZCZE RAZ'
 
     page = requests.get(f'https://www.olx.pl/nieruchomosci/dzialki/{loc}/?search[filter_enum_type][0]=dzialki-budowlane&search%5Bfilter_float_m%3Afrom%5D={surface_min}&search%5Bfilter_float_m%3Ato%5D={surface_max}&search%5Bprivate_business%5D={seller}')
     soup = BeautifulSoup(page.content, 'html.parser')
+
+    if soup.find_all(class_='emptynew large lheight18') != []:
+        return 'BRAK WYNIKÓW W TEJ OKOLICY'
 
     num_of_sites = soup.find_all(class_ = 'block br3 brc8 large tdnone lheight24') #info about num of pages
 
@@ -31,12 +35,18 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
                 if sites != "#": #elims # dunno why this occurs
                     offers_to_wrap.append(sites)#sites
 
-        offers_to_wrap = [offer for offer in (list(set(offers_to_wrap))) if "otodom" not in offer] #delete otodom from offers
+        offers_to_wrap = [offer for offer in (list(set(offers_to_wrap))) if "otodom" not in offer] #delete otodom from offers and promoted
 
         for offer in offers_to_wrap:
             page = requests.get(offer)
             soup = BeautifulSoup(page.content, 'html.parser') #soup new page
             infos = soup.find_all(class_='offer-details__value') #get infos from tiles
+
+            #deling promoted
+            if offer[-9:] == ';promoted':
+                links.append('del')
+            else:
+                links.append(offer)
 
             #tables to dataframe
             dealers.append(infos[0].get_text().strip()) # private/buissness
@@ -46,7 +56,6 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
             prices.append(float(infos[3].get_text().split(' ')[0].strip())) #price/m^2
             
             #if main info contains word's like electricity', 'water', 'gas', 'media', 'armed' means that is medialised
-
             if any(med in soup.find(class_='clr lheight20 large').get_text() for med in ['prad','woda', 'gaz', 'media', 'uzbrojona']):
                 descriptions.append('Tak')
             else:
@@ -61,14 +70,21 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
         'Powierzchnia m^2': surfaces,
         'Cena za m^2': prices,
         'Media': descriptions,
-        'Lokalizacja':localizations
+        'Lokalizacja':localizations,
+        'Link do strony':links
     })
+
+    #elim duplicates
+    data_from_sites.drop_duplicates(subset='Link do strony')
 
     #if we want to find plot with media
     if media_on == True: 
         data_from_sites = data_from_sites[data_from_sites['Media'] != 'Nie']
     else: #if we want to find plot without media
         data_from_sites = data_from_sites[data_from_sites['Media'] != 'Tak']
+
+    #clearing some data
+    data_from_sites = data_from_sites[data_from_sites['Link do strony'] != 'del']
 
     prices = data_from_sites['Cena za m^2'].to_list() #we need this because we deleted rows with/without media se we need to calculate new averange prices
 
@@ -77,3 +93,5 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     data_from_sites.sort_values(by='Lokalizacja').to_excel(f'data/{loc}_{now}.xlsx')
     
     return f'{loc}\n SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2\n  WYNOSI: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
+
+scrap_OLX('Lodz', 2000, 10000000000, '', True)
