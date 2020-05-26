@@ -72,15 +72,26 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
 
             infos = soup.find(class_='css-1ci0qpi').find_all('li') #infos under images
 
-            #price/m^2,med,loc,link
+            #link
+            links.append(offer)
+
             dealers.append(soup.find(class_='css-1gjwmw9').get_text().strip()) #add dealer
 
             surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
 
-            prices.append(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1])) #prices
+            prices.append(float(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1]))) #prices
             
             #medialize
+            description = str(soup.find(class_='css-1bi3ib9').find_all('p')) #all description
+
+            if any(med in description for med in ['prad','woda', 'gaz', 'media', 'uzbrojona']): #find if is medialized
+                descriptions.append('Tak')
+            else:
+                descriptions.append('Nie') 
             
+            localizations.append(soup.find(class_='css-12hd9gg').get_text().split('}')[-1]) #add localization
+
+
 
 
 
@@ -116,4 +127,4 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     
     return f'{loc}\n SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2\n  WYNOSI: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
 
-scrap_OLX('Lodz', 2000, 10000000000, '', True)
+scrap_OLX('Lodz', 2000, 10000000000, 'business', True)
