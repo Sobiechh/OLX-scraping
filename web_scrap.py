@@ -27,17 +27,19 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     for i in range(1,num_of_sites+1): # [1,2,...., num of pages]
         offers = soup.find_all(class_ = 'offer-wrapper')
 
-        offers_to_wrap = []
-
+        offers_to_wrap_olx, offers_to_wrap_otodom = [],[]
         for offer in offers: #through offers
             for link in offer.find_all('a'): #through links
                 sites = link.get('href') #get href value
                 if sites != "#": #elims # dunno why this occurs
-                    offers_to_wrap.append(sites)#sites
+                    offers_to_wrap_olx.append(sites)#sites
 
-        offers_to_wrap = [offer for offer in (list(set(offers_to_wrap))) if "otodom" not in offer] #delete otodom from offers and promoted
+        offers_to_wrap_otodom = [offer for offer in list(set(offers_to_wrap_olx)) if "otodom" in offer]
+        offers_to_wrap_olx = [offer for offer in (list(set(offers_to_wrap_olx))) if "otodom" not in offer] #delete otodom from offers
+        
 
-        for offer in offers_to_wrap:
+        #OLX
+        for offer in offers_to_wrap_olx:
             page = requests.get(offer)
             soup = BeautifulSoup(page.content, 'html.parser') #soup new page
             infos = soup.find_all(class_='offer-details__value') #get infos from tiles
@@ -62,6 +64,26 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
                 descriptions.append('Nie') # to del
             
             localizations.append(soup.find(class_='offer-user__address').p.get_text().split(',')[-1].strip()) # exact location
+        
+        #OTODOM
+        for offer in offers_to_wrap_otodom:
+            page = requests.get(offer)
+            soup = BeautifulSoup(page.content, 'html.parser') #soup new page
+
+            infos = soup.find(class_='css-1ci0qpi').find_all('li') #infos under images
+
+            #price/m^2,med,loc,link
+            dealers.append(soup.find(class_='css-1gjwmw9').get_text().strip()) #add dealer
+
+            surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
+
+            prices.append(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1])) #prices
+            
+            #medialize
+            
+
+
+
 
 
     #making df

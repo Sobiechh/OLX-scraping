@@ -31,7 +31,7 @@ t2.grid(row=2, column =0, sticky = tk.E)
 media_on = tk.BooleanVar() #boolen value for media
 tk.Checkbutton(window, text='Media',variable=media_on, onvalue=True, offvalue=False).grid(row=3, column =0) #checkbutton
 
-#cities read with image_read
+#cities read with cv2 
 regions = {
     'Aleksandrów Łódzki':'Aleksandrow-Lodzki',
     'Bełchatów':'Belchatow',
