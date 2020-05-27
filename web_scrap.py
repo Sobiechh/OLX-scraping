@@ -25,6 +25,9 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
         num_of_sites = int(num_of_sites[-1].find('span').get_text()) # pare nums of pages to int (to loop)
 
     for i in range(1,num_of_sites+1): # [1,2,...., num of pages]
+        page = requests.get(f'https://www.olx.pl/nieruchomosci/dzialki/{loc}/?search[filter_enum_type][0]=dzialki-budowlane&search%5Bfilter_float_m%3Afrom%5D={surface_min}&search%5Bfilter_float_m%3Ato%5D={surface_max}&search%5Bprivate_business%5D={seller}&page={i}')
+        soup = BeautifulSoup(page.content, 'html.parser')
+
         offers = soup.find_all(class_ = 'offer-wrapper')
 
         offers_to_wrap_olx, offers_to_wrap_otodom = [],[]
@@ -79,7 +82,10 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
 
             surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
 
-            prices.append(float(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1]))) #prices
+            if soup.find(class_='css-zdpt2t').get_text() == "":
+                prices.append('del')
+            else:
+                prices.append(float(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1]))) #prices
             
             #medialize
             description = str(soup.find(class_='css-1bi3ib9').find_all('p')) #all description
@@ -90,11 +96,6 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
                 descriptions.append('Nie') 
             
             localizations.append(soup.find(class_='css-12hd9gg').get_text().split('}')[-1]) #add localization
-
-
-
-
-
 
 
     #making df
@@ -118,6 +119,8 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
 
     #clearing some data
     data_from_sites = data_from_sites[data_from_sites['Link do strony'] != 'del']
+    data_from_sites = data_from_sites[data_from_sites['Cena za m^2'] != 'del']
+
 
     prices = data_from_sites['Cena za m^2'].to_list() #we need this because we deleted rows with/without media se we need to calculate new averange prices
 
@@ -127,4 +130,4 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     
     return f'{loc}\n SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2\n  WYNOSI: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
 
-scrap_OLX('Lodz', 2000, 10000000000, 'business', True)
+#scrap_OLX('Lodz', 100, 25000, '', True)
