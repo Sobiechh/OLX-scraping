@@ -5,7 +5,7 @@ import datetime as dt #to save file xslx
 
 
 def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
-    dealers, surfaces, prices, descriptions, localizations, links = [], [], [], [], [], []#tables to dataframe
+    dealers, surfaces, prices, descriptions, localizations, links, titles  = [], [], [], [], [], [], []#tables to dataframe
 
     #check surface min/max bug
     if surface_min>surface_max:
@@ -54,6 +54,9 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
                 links.append(offer)
 
             #tables to dataframe
+            titles.append(soup.find(class_='offer-titlebox').find('h1').get_text().strip()) #add title
+
+
             dealers.append(infos[0].get_text().strip()) # private/buissness
 
             surfaces.append((''.join(infos[2].get_text().split(' ')[:-1]).strip())) #size of the surface
@@ -73,14 +76,18 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
             page = requests.get(offer)
             soup = BeautifulSoup(page.content, 'html.parser') #soup new page
 
-            infos = soup.find(class_='css-1ci0qpi').find_all('li') #infos under images
+            if soup.find(class_='css-1ci0qpi') != None:
+                infos = soup.find(class_='css-1ci0qpi').find_all('li') #infos under images
+                surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
+            else:
+                surfaces.append('del')
 
             #link
             links.append(offer)
 
-            dealers.append(soup.find(class_='css-1gjwmw9').get_text().strip()) #add dealer
+            titles.append(soup.find(class_='css-1ld8fwi').get_text()) #add title
 
-            surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
+            dealers.append(soup.find(class_='css-1gjwmw9').get_text().strip()) #add dealer
 
             if soup.find(class_='css-zdpt2t').get_text() == "":
                 prices.append('del')
@@ -100,6 +107,7 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
 
     #making df
     data_from_sites= pd.DataFrame({
+        'Tytul':titles,
         'Oferta od': dealers,
         'Powierzchnia m^2': surfaces,
         'Cena za m^2': prices,
@@ -109,7 +117,10 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     })
 
     #elim duplicates
-    data_from_sites.drop_duplicates(subset='Link do strony')
+    data_from_sites = data_from_sites.drop_duplicates(subset='Link do strony')
+    data_from_sites = data_from_sites.drop_duplicates(subset='Tytul')
+
+    data_from_sites = data_from_sites.drop('Tytul', axis=1)
 
     #if we want to find plot with media
     if media_on == True: 
@@ -121,13 +132,12 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     data_from_sites = data_from_sites[data_from_sites['Link do strony'] != 'del']
     data_from_sites = data_from_sites[data_from_sites['Cena za m^2'] != 'del']
 
-
     prices = data_from_sites['Cena za m^2'].to_list() #we need this because we deleted rows with/without media se we need to calculate new averange prices
 
     now = dt.datetime.now() #datetime.now to .xslx file
-    now = now.strftime("Dane Data %d_%m_%Y Godzina %H_%M_%S") # : <- forbidden in file save
+    now = now.strftime("%d_%m_%Y Godzina %H_%M_%S") # : <- forbidden in file save
     data_from_sites.sort_values(by='Lokalizacja').to_excel(f'data/{loc}_{now}.xlsx')
     
     return f'{loc}\n SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2\n  WYNOSI: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
 
-#scrap_OLX('Lodz', 100, 25000, '', True)
+#scrap_OLX('Lodz', 100, 25000, '', False)

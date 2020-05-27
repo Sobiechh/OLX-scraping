@@ -21,10 +21,8 @@ from bs4 import BeautifulSoup #scrap page
 
 #print(soup.find(class_='css-12hd9gg').get_text().split('}')[-1])
 
-page = requests.get(f'https://www.otodom.pl/oferta/okregowa-26-dzialka-do-wynajecia-400m2-20x20m-ID42exJ.html?')
+page = requests.get(f'https://www.olx.pl/oferta/sprzedam-dzialke-budowlana-ul-rataja-CID3-IDET3Np.html#ddbee2a1ec')
 soup = BeautifulSoup(page.content, 'html.parser')
 
-cena = soup.find(class_='css-zdpt2t').get_text()
-
-if soup.find(class_='css-zdpt2t').get_text() == "":
-    print("heheszki")
+titlebox = soup.find(class_='offer-titlebox')
+print(soup.find(class_='offer-titlebox').find('h1').get_text().strip())
