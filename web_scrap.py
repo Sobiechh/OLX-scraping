@@ -72,37 +72,37 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
             localizations.append(soup.find(class_='offer-user__address').p.get_text().split(',')[-1].strip()) # exact location
         
         #OTODOM
-        for offer in offers_to_wrap_otodom:
-            page = requests.get(offer)
-            soup = BeautifulSoup(page.content, 'html.parser') #soup new page
+        # for offer in offers_to_wrap_otodom:
+        #     page = requests.get(offer)
+        #     soup = BeautifulSoup(page.content, 'html.parser') #soup new page
 
-            if soup.find(class_='css-1ci0qpi') != None:
-                infos = soup.find(class_='css-1ci0qpi').find_all('li') #infos under images
-                surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
-            else:
-                surfaces.append('del')
+        #     if soup.find(class_='css-1ci0qpi') != None:
+        #         infos = soup.find(class_='css-1ci0qpi').find_all('li') #infos under images
+        #         surfaces.append(''.join(infos[0].find('strong').get_text().split()[:-1])) #surfaces
+        #     else:
+        #         surfaces.append('del')
 
-            #link
-            links.append(offer)
+        #     #link
+        #     links.append(offer)
 
-            titles.append(soup.find(class_='css-1ld8fwi').get_text()) #add title
+        #     titles.append(soup.find(class_='css-1ld8fwi').get_text()) #add title
 
-            dealers.append(soup.find(class_='css-1gjwmw9').get_text().strip()) #add dealer
+        #     dealers.append(soup.find(class_='css-1gjwmw9').get_text().strip()) #add dealer
 
-            if soup.find(class_='css-zdpt2t').get_text() == "":
-                prices.append('del')
-            else:
-                prices.append(float(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1]))) #prices
+        #     if soup.find(class_='css-zdpt2t').get_text() == "":
+        #         prices.append('del')
+        #     else:
+        #         prices.append(float(''.join(soup.find(class_='css-zdpt2t').get_text().split(' ')[:-1]))) #prices
             
-            #medialize
-            description = str(soup.find(class_='css-1bi3ib9').find_all('p')) #all description
+        #     #medialize
+        #     description = str(soup.find(class_='css-1bi3ib9').find_all('p')) #all description
 
-            if any(med in description for med in ['prad','woda', 'gaz', 'media', 'uzbrojona']): #find if is medialized
-                descriptions.append('Tak')
-            else:
-                descriptions.append('Nie') 
+        #     if any(med in description for med in ['prad','woda', 'gaz', 'media', 'uzbrojona']): #find if is medialized
+        #         descriptions.append('Tak')
+        #     else:
+        #         descriptions.append('Nie') 
             
-            localizations.append(soup.find(class_='css-12hd9gg').get_text().split('}')[-1]) #add localization
+        #     localizations.append(soup.find(class_='css-12hd9gg').get_text().split('}')[-1]) #add localization
 
 
     #making df
