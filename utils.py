@@ -28,14 +28,16 @@ def get_page_count(soup):
     return int(nums[-1])
 
 def get_offer_links(soup):
+
     if check_page_content(soup) == False:
         return None
     
     offers = soup.find_all(class_="wrap")
-    
-    links = offers[0].find_all('a')
+    links = [offer.find("a").get("href") for offer in offers if offer.find("a").get("href") != "#"]
+
     return links
 
+    
 
 odp = get_url_content(TEST_URL1)
 print(get_offer_links(odp))
