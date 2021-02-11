@@ -139,5 +139,3 @@ def scrap_OLX(loc, surface_min, surface_max, seller, media_on):
     data_from_sites.sort_values(by='Lokalizacja').to_excel(f'data/{loc}_{now}.xlsx')
     
     return f'{loc}\n SREDNIA CENA ZA DZIALKE {surface_min}-{surface_max} m^2\n  WYNOSI: {round(sum(prices)/len(prices),2)}zł/m^2' if len(prices)!=0 else f'BRAK WYNIKOW'
-
-scrap_OLX('Lodz', 100, 25000, '', True)
