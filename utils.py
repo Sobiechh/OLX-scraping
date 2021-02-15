@@ -7,17 +7,26 @@ TEST_URL2 = "https://www.olx.pl/nieruchomosci/dzialki/tomaszow-mazowiecki/?searc
 TEST_URL3 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/?search%5Bfilter_float_m%3Ato%5D=200"
 
 def get_url_content(url_link):
+    """
+    Get all html code frome page
+    """
     page = requests.get(url_link)
     html_parser = BeautifulSoup(page.content, "html.parser")
 
     return html_parser
 
 def check_page_content(soup):
+    """
+    Return false when nothing meets criteria
+    """
     if soup.find(class_="emptynew" ) == None:
-        return True
+        return True 
     return False
 
 def get_page_count(soup):
+    """
+    Return number of pages
+    """
     pager = soup.find(class_="pager")
     if pager == None: 
         return
@@ -28,7 +37,9 @@ def get_page_count(soup):
     return int(nums[-1])
 
 def get_offer_links(soup):
-
+    """
+    Gets all links from one site and return them into a list
+    """
     if check_page_content(soup) == False:
         return None
     
@@ -37,8 +48,8 @@ def get_offer_links(soup):
 
     return links
 
-    
 
+#tests
 odp = get_url_content(TEST_URL1)
 print(get_offer_links(odp))
 odp = get_url_content(TEST_URL2)

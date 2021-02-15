@@ -1,7 +1,7 @@
 """
-Get content from olx page
+Get content from otodom page
 """
-class Olx:
+class Otodom:
     def __init__(self, url):
         self.url = url
 
