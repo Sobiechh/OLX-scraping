@@ -5,6 +5,7 @@ import requests
 TEST_URL1 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/"
 TEST_URL2 = "https://www.olx.pl/nieruchomosci/dzialki/tomaszow-mazowiecki/?search%5Bfilter_float_price%3Ato%5D=1"
 TEST_URL3 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/?search%5Bfilter_float_m%3Ato%5D=200"
+TEST_URL4 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/?search%5Bfilter_float_price%3Ato%5D=50000"
 
 current_page_number = 1
 
@@ -12,8 +13,9 @@ def get_url_content(url_link, page_number):
     """
     Get all html code frome page
     """
-    page_number_url = f"/?page={page_number}"
+    page_number_url = f"&page={page_number}"
     page = requests.get(url_link+page_number_url)
+    print("jestem na stronie", url_link+page_number_url)
     html_parser = BeautifulSoup(page.content, "html.parser")
 
     return html_parser
@@ -26,18 +28,19 @@ def check_page_content(soup):
         return True
     return False
 
-def get_page_count(soup):
+def get_page_count(url_criteria):
     """
     Return number of pages
     """
+    soup = get_url_content(url_criteria, 1)
     pager = soup.find(class_="pager")
+
     if pager == None: 
         return 1
     
     pager_items = pager.find_all(class_="item")
     numbers = [num.find('span').get_text() for num in pager_items]
 
-    print(numbers)
     return int(numbers[-1])
 
 def get_page_links(soup):
@@ -47,7 +50,7 @@ def get_page_links(soup):
     if check_page_content(soup) == False:
         return None
     
-    offers = soup.find_all(class_="wrap")
+    offers = soup.find_all(class_="offer-wrapper")
     links = [offer.find("a").get("href") for offer in offers if offer.find("a").get("href") != "#"]
 
     return links
@@ -56,33 +59,48 @@ def get_all_offers(url_criteria):
     """
     Get all links offer from all sites
     """
-    url_content = get_url_content(url_criteria, current_page_number)
-    num_of_sites = get_page_count(url_content)
+    num_of_sites = get_page_count(url_criteria)
 
     all_offers = []
 
     for page_number in range(1, num_of_sites+1):
         url_content = get_url_content(url_criteria, page_number)
         page_links = get_page_links(url_content)
+        if page_links == None:
+            return []
         all_offers.extend(page_links)
     
-    return reduce_promoted(all_offers)
+    return reduce_duplicates(all_offers)
 
-def reduce_promoted(list_of_offers):
-    """
-    Reduce ';promoted' from link to avoid duplicates
-    """
-    for index, link in enumerate(list_of_offers):
-        if ";promoted" in link:
-            list_of_offers[index] = link.split(";")[0]
+    # for x in all_offers:
+    #     print(x)
+    # return all_offers
 
-    return list_of_offers
+def reduce_duplicates(list_of_offers):
+    """
+    Reduce duplicated offers
+    """
+    added_names = []
+    offers = []
+    for elem in list_of_offers:
+        name_of_offer = elem.split("CID3")[0]
+        
+        added_names.append(name_of_offer)
+        if added_names.count(name_of_offer) <= 1:
+            offers.append(elem)
+
+    for x in added_names:
+        print(x)
+
+    print(len(offers), len(set(offers)))
+    return list(set(offers))
 
 #tests
-odp = get_all_offers(TEST_URL3)
+# odp = get_all_offers(TEST_URL1)
+# print(len(odp))
+# odp = get_all_offers(TEST_URL2)
+# print(len(odp))
+# odp = get_all_offers(TEST_URL3)
+# print(len(odp))
+odp = get_all_offers(TEST_URL4)
 print(len(odp))
-odp = get_all_offers(TEST_URL2)
-print(len(odp))
-odp = get_all_offers(TEST_URL3)
-print(len(odp))
-
