@@ -15,7 +15,6 @@ def get_url_content(url_link, page_number):
     """
     page_number_url = f"&page={page_number}"
     page = requests.get(url_link+page_number_url)
-    print("jestem na stronie", url_link+page_number_url)
     html_parser = BeautifulSoup(page.content, "html.parser")
 
     return html_parser
@@ -26,6 +25,7 @@ def check_page_content(soup):
     """
     if soup.find(class_="emptynew" ) == None:
         return True
+    
     return False
 
 def get_page_count(url_criteria):
@@ -66,34 +66,20 @@ def get_all_offers(url_criteria):
     for page_number in range(1, num_of_sites+1):
         url_content = get_url_content(url_criteria, page_number)
         page_links = get_page_links(url_content)
+
         if page_links == None:
             return []
+
         all_offers.extend(page_links)
     
     return reduce_duplicates(all_offers)
-
-    # for x in all_offers:
-    #     print(x)
-    # return all_offers
 
 def reduce_duplicates(list_of_offers):
     """
     Reduce duplicated offers
     """
-    added_names = []
-    offers = []
-    for elem in list_of_offers:
-        name_of_offer = elem.split("CID3")[0]
-        
-        added_names.append(name_of_offer)
-        if added_names.count(name_of_offer) <= 1:
-            offers.append(elem)
-
-    for x in added_names:
-        print(x)
-
-    print(len(offers), len(set(offers)))
-    return list(set(offers))
+    print(list(set(list_of_offers)))
+    return list(set(list_of_offers))
 
 #tests
 # odp = get_all_offers(TEST_URL1)
