@@ -1,5 +1,7 @@
 from bs4 import BeautifulSoup
 import requests
+from selenium import webdriver
+import time
 
 """
 Get content from otodom page
@@ -7,10 +9,6 @@ Get content from otodom page
 TEST_URL = "https://www.otodom.pl/pl/oferta/malanow-promocja-dzialki-budowlane-ID3Z50c.html?"
 TEST_URL2 ="https://www.otodom.pl/pl/oferta/dzialka-projekt-pozwolenie-na-budowe-fak-vat-ID49gOh.html#08fbc89bdc"
 
-def get_bottom_bar(soup):
-    bottom_bar = soup.find_all(class_="offer-bottombar__item")
-
-    return bottom_bar
 
 def get_offer_id(bottom_bar):
     offer_id = bottom_bar[-1].find("strong").get_text()
@@ -89,5 +87,31 @@ def get_offer_infos(url):
 
     return details
 
+def get_bottom_bar(soup):
+    # bottom_bar = soup.find_all(lambda tag: tag.name == 'div')
+    #and tag.get('class') == ['z']
 
-print(get_offer_infos(TEST_URL))
+    bottom_bar = soup.select("div.css-y2xgt6.et0r0y90")
+
+    return bottom_bar
+
+
+# page = requests.get(TEST_URL)
+
+# soup = BeautifulSoup(page.content, "html.parser")
+
+
+driver = webdriver.Chrome()
+driver.get(TEST_URL)
+c = driver.page_source
+soup = BeautifulSoup(c, "html.parser")
+
+# with open("wynik.txt") as file:
+#     file.write(soup)
+
+get_element  = bottom_bar = soup.find_all("div", {"class" : "css-jjerc6 edhdn7k3"})
+print(get_element)
+
+driver.close()
+
+# print(get_bottom_bar(soup))
