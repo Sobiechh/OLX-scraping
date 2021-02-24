@@ -1,6 +1,8 @@
 from bs4 import BeautifulSoup
 import logging
 import requests
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 TEST_URL1 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/"
 TEST_URL2 = "https://www.olx.pl/nieruchomosci/dzialki/tomaszow-mazowiecki/?search%5Bfilter_float_price%3Ato%5D=1"
@@ -11,11 +13,24 @@ current_page_number = 1
 
 def get_url_content(url_link, page_number):
     """
-    Get all html code frome page
+    Get source code frome page
     """
-    page_number_url = f"&page={page_number}"
-    page = requests.get(url_link+page_number_url)
-    html_parser = BeautifulSoup(page.content, "html.parser")
+
+    if page_number != None:
+        url_link += f"&page={page_number}"
+    
+    #headless option to chromedriver
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+
+    #webdriver get source
+    driver = webdriver.Chrome(chrome_options=chrome_options)
+    driver.get(url_link)
+    page_source = driver.page_source
+
+
+    html_parser = BeautifulSoup(page_source, "html.parser")
+    driver.close()
 
     return html_parser
 
@@ -88,5 +103,5 @@ def reduce_duplicates(list_of_offers):
 # print(len(odp))
 # odp = get_all_offers(TEST_URL3)
 # print(len(odp))
-odp = get_all_offers(TEST_URL4)
-print(len(odp))
+# odp = get_all_offers(TEST_URL4)
+# print(len(odp))
