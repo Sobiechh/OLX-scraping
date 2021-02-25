@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 import requests
 from selenium import webdriver
 import time
-from utils import get_url_content
+from utils import get_url_content, txt_to_float
 
 """
 Get content from otodom page
