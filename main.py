@@ -8,7 +8,6 @@ def print_average_value():
 #tkinter initial window
 window = tk.Tk() #window
 window.title('OLX Projekt') #Set title
-#window.geometry('800x400') #Set geometry
 
 #surfaces menu
 surfaces = [100, 300,500,800,1000,1500]

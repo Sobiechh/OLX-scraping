@@ -56,10 +56,6 @@ def get_offer_price(soup):
 def get_offer_infos(url):
     soup = get_url_content(url, None)
 
-    """
-    offer_id -> get from bottom bar
-    offer_surfacet -> get from details at the top of page
-    """
     offer_id = get_offer_id(soup)
     offer_surface = get_offer_surface(soup)
     offer_title = get_offer_title(soup)
@@ -79,5 +75,7 @@ def get_offer_infos(url):
     return details
 
 details = get_offer_infos(TEST_URL)
+details2 = get_offer_infos(TEST_URL2)
 
 print(details)
+print(details2)

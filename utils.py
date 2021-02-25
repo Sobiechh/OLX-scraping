@@ -70,7 +70,7 @@ def get_page_links(soup):
 
     return links
 
-def get_all_offers(url_criteria):
+def get_all_links(url_criteria):
     """
     Get all links offer from all sites
     """
@@ -93,7 +93,7 @@ def reduce_duplicates(list_of_offers):
     """
     Reduce duplicated offers
     """
-    print(list(set(list_of_offers)))
+
     return list(set(list_of_offers))
 
 def txt_to_float(text):
@@ -103,3 +103,24 @@ def txt_to_float(text):
     parsed = float("".join(text.replace(",",".").split(" ")[:-1]))
 
     return parsed
+
+def get_search_filter(filter_name, filter_value):
+    """
+    Get filters
+    """
+    if filter_name == "localization":
+        pass
+    if filter_name == "surface_min":
+        pass
+    if filter_name == "surface_max":
+        pass
+    if filter_name == "seller":
+        pass
+    
+    
+    
+#---FILTERS---
+#loc
+#surface min
+#surface max
+#seller
