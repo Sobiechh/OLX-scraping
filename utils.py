@@ -95,13 +95,3 @@ def reduce_duplicates(list_of_offers):
     """
     print(list(set(list_of_offers)))
     return list(set(list_of_offers))
-
-#tests
-# odp = get_all_offers(TEST_URL1)
-# print(len(odp))
-# odp = get_all_offers(TEST_URL2)
-# print(len(odp))
-# odp = get_all_offers(TEST_URL3)
-# print(len(odp))
-# odp = get_all_offers(TEST_URL4)
-# print(len(odp))
