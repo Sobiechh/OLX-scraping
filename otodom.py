@@ -11,14 +11,6 @@ TEST_URL = "https://www.otodom.pl/pl/oferta/malanow-promocja-dzialki-budowlane-I
 TEST_URL2 ="https://www.otodom.pl/pl/oferta/dzialka-projekt-pozwolenie-na-budowe-fak-vat-ID49gOh.html#08fbc89bdc"
 
 
-def txt_to_float(text):
-    """
-    Parse number in text from olx offer to float
-    """
-    parsed = float("".join(text.replace(",",".").split(" ")[:-1]))
-
-    return parsed
-
 def get_offer_id(soup):
     
     offer_id_desc = soup.find("div", {"class" : "css-jjerc6 edhdn7k3"})

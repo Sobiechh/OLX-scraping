@@ -95,3 +95,11 @@ def reduce_duplicates(list_of_offers):
     """
     print(list(set(list_of_offers)))
     return list(set(list_of_offers))
+
+def txt_to_float(text):
+    """
+    Parse number in text from olx offer to float
+    """
+    parsed = float("".join(text.replace(",",".").split(" ")[:-1]))
+
+    return parsed
