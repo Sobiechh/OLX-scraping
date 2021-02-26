@@ -11,13 +11,19 @@ TEST_URL4 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/?search%5Bfilter_f
 
 current_page_number = 1
 
-def get_url_content(url_link, page_number):
+def get_url_content(url_link, page_number, **filters):
     """
     Get source code frome page
     """
 
+    print(filters)
+    print()
+    print()
     if page_number != None:
-        url_link += f"&page={page_number}"
+        url_link += f"&page={page_number}&"
+
+    for key, value in filters.items():
+        url_link += get_search_filter(key, value) + "&"
     
     #headless option to chromedriver
     chrome_options = Options()
@@ -31,6 +37,8 @@ def get_url_content(url_link, page_number):
 
     html_parser = BeautifulSoup(page_source, "html.parser")
     driver.close()
+
+    print(url_link)
 
     return html_parser
 
@@ -109,18 +117,22 @@ def get_search_filter(filter_name, filter_value):
     Get filters
     """
     if filter_name == "localization":
-        pass
+        value = f"{filter_value}/"
     if filter_name == "surface_min":
-        pass
+        value = f"search%5Bfilter_float_m%3Afrom%5D={filter_value}"
     if filter_name == "surface_max":
-        pass
+        value = f"search%5Bfilter_float_m%3Ato%5D={filter_value}"
     if filter_name == "seller":
-        pass
+        value = f"search%5Bprivate_business%5D={filter_value}"
+    if filter_name == "type":
+        value = f"search%5Bfilter_enum_type%5D%5B0%5D={filter_value}"
+
+    return value
     
-    
-    
-#---FILTERS---
-#loc
-#surface min
-#surface max
-#seller
+get_url_content("https://www.olx.pl/nieruchomosci/dzialki/?", 
+                5, 
+                surface_min=100,
+                surface_max=3000,
+                seller="private",
+                type="dzialki-budowlane"
+                )
