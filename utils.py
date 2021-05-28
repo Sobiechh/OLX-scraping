@@ -1,33 +1,25 @@
 from bs4 import BeautifulSoup
-import logging
-import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-
-TEST_URL1 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/"
-TEST_URL2 = "https://www.olx.pl/nieruchomosci/dzialki/tomaszow-mazowiecki/?search%5Bfilter_float_price%3Ato%5D=1"
-TEST_URL3 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/?search%5Bfilter_float_m%3Ato%5D=200"
-TEST_URL4 = "https://www.olx.pl/nieruchomosci/dzialki/lodzkie/?search%5Bfilter_float_price%3Ato%5D=50000"
-
-current_page_number = 1
+import logging
+from selenium.webdriver.remote.remote_connection import LOGGER
+LOGGER.setLevel(level=logging.WARNING)
 
 def get_url_content(url_link, page_number, **filters):
     """
     Get source code frome page
     """
 
-    print(filters)
-    print()
-    print()
     if page_number != None:
-        url_link += f"&page={page_number}&"
+        url_link += f"?page={page_number}"
 
     for key, value in filters.items():
-        url_link += get_search_filter(key, value) + "&"
+        url_link += get_search_filter(key, value)
     
     #headless option to chromedriver
     chrome_options = Options()
     chrome_options.add_argument("--headless")
+    chrome_options.add_argument('--log-level=3')
 
     #webdriver get source
     driver = webdriver.Chrome(chrome_options=chrome_options)
@@ -35,12 +27,10 @@ def get_url_content(url_link, page_number, **filters):
     page_source = driver.page_source
 
 
-    html_parser = BeautifulSoup(page_source, "html.parser")
+    soup = BeautifulSoup(page_source, "html.parser")
     driver.close()
 
-    print(url_link)
-
-    return html_parser
+    return soup, url_link
 
 def check_page_content(soup):
     """
@@ -51,20 +41,18 @@ def check_page_content(soup):
     
     return False
 
-def get_page_count(url_criteria):
+def get_page_count(soup):
     """
     Return number of pages
     """
-    soup = get_url_content(url_criteria, 1)
     pager = soup.find(class_="pager")
 
     if pager == None: 
         return 1
     
     pager_items = pager.find_all(class_="item")
-    numbers = [num.find('span').get_text() for num in pager_items]
 
-    return int(numbers[-1])
+    return int(pager_items[-1].get_text() )
 
 def get_page_links(soup):
     """
@@ -77,25 +65,6 @@ def get_page_links(soup):
     links = [offer.find("a").get("href") for offer in offers if offer.find("a").get("href") != "#"]
 
     return links
-
-def get_all_links(url_criteria):
-    """
-    Get all links offer from all sites
-    """
-    num_of_sites = get_page_count(url_criteria)
-
-    all_offers = []
-
-    for page_number in range(1, num_of_sites+1):
-        url_content = get_url_content(url_criteria, page_number)
-        page_links = get_page_links(url_content)
-
-        if page_links == None:
-            return []
-
-        all_offers.extend(page_links)
-    
-    return reduce_duplicates(all_offers)
 
 def reduce_duplicates(list_of_offers):
     """
@@ -117,22 +86,17 @@ def get_search_filter(filter_name, filter_value):
     Get filters
     """
     if filter_name == "localization":
-        value = f"{filter_value}/"
+        value = f"{filter_value}/?"
     if filter_name == "surface_min":
-        value = f"search%5Bfilter_float_m%3Afrom%5D={filter_value}"
+        value = f"search%5Bfilter_float_m%3Afrom%5D={filter_value}&"
     if filter_name == "surface_max":
-        value = f"search%5Bfilter_float_m%3Ato%5D={filter_value}"
+        value = f"search%5Bfilter_float_m%3Ato%5D={filter_value}&"
     if filter_name == "seller":
-        value = f"search%5Bprivate_business%5D={filter_value}"
+        if filter_value == "all":
+            value = ""
+        else:
+            value = f"search%5Bprivate_business%5D={filter_value}&"
     if filter_name == "type":
-        value = f"search%5Bfilter_enum_type%5D%5B0%5D={filter_value}"
+        value = f"search%5Bfilter_enum_type%5D%5B0%5D={filter_value}&"
 
     return value
-    
-get_url_content("https://www.olx.pl/nieruchomosci/dzialki/?", 
-                5, 
-                surface_min=100,
-                surface_max=3000,
-                seller="private",
-                type="dzialki-budowlane"
-                )
