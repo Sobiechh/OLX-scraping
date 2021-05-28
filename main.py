@@ -1,9 +1,9 @@
 import tkinter as tk #tkinter app
-from web_scrap import scrap_OLX #second file
+from manage import scrap_olx
 
 #result of program
 def print_average_value(): 
-    label.config(text=f'{scrap_OLX(regions[region_var.get()], surface_min.get(), surface_max.get(), var_dealer.get(), media_on.get())}')
+    label.config(text=f'{scrap_olx(regions[region_var.get()], surface_min.get(), surface_max.get(), var_dealer.get())}')
 
 #tkinter initial window
 window = tk.Tk() #window
