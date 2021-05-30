@@ -15,7 +15,7 @@ class OTODOMimporter:
         return offer_id
 
     def get_offer_surface(self):
-        surface_txt = self.find("div", {"class" : "css-1ytkscc"})
+        surface_txt = self.soup.find("div", {"class" : "css-1ytkscc"})
         surface = self.utils.txt_to_float(surface_txt.text) if surface_txt else None
 
         return surface

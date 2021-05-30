@@ -6,14 +6,14 @@ from selenium.webdriver.remote.remote_connection import LOGGER
 LOGGER.setLevel(level=logging.WARNING)
 
 class Utils:
-    def __init__(self):
-        #headless option to chromedriver
-        self.chrome_options = Options()
-        self.chrome_options.add_argument("--headless")
-        self.chrome_options.add_argument('--log-level=3')
+    # def __init__(self):
+    #     #headless option to chromedriver
+    #     self.chrome_options = Options()
+    #     self.chrome_options.add_argument("--headless")
+    #     self.chrome_options.add_argument('--log-level=3')
 
-        #webdriver get source
-        self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
+    #     #webdriver get source
+    #     self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
 
 
     def get_url_content(self, url_link, page_number=None, **filters):
@@ -36,7 +36,7 @@ class Utils:
         
 
         driver.get(url_link)
-        page_source = self.driver.page_source
+        page_source = driver.page_source
 
 
         soup = BeautifulSoup(page_source, "html.parser")

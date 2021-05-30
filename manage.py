@@ -3,6 +3,7 @@ from os import urandom
 from otodom import OTODOMimporter
 from olx import OLXimporter
 from utils import Utils
+from data import DataManage
 
 import pandas as pd
 
@@ -46,11 +47,4 @@ class Manage:
 
                 documents.append(site_content)
 
-        df = pd.DataFrame().from_records(documents)
-
-        df.to_excel('data.xlsx')
-
-    
-x = Manage("Lodz", 5000, 8000, "all")
-
-x.scrap_olx()
+        DataManage().save_data(documents)
