@@ -16,8 +16,6 @@ class Manage:
         self.seller = seller
 
         self.utils = Utils()
-        self.olx_importer = OLXimporter()
-        self.otodom_importer = OTODOMimporter()
 
     def scrap_olx(self):
         soup, url_link = self.utils.get_url_content(BASE_URL,
@@ -40,12 +38,19 @@ class Manage:
                 is_olx = page_link.startswith('https://www.olx')
 
                 if is_olx:
-                    site_content = self.olx_importer.get_offer_infos(soup, url_link)
+                    olx_importer = OLXimporter(soup, page_link)
+                    site_content = olx_importer.get_offer_infos()
                 else:
-                    site_content = self.otodom_importer.get_offer_infos(soup, url_link)
+                    otodom_importer = OTODOMimporter(soup, page_link)
+                    site_content = otodom_importer.get_offer_infos()
 
                 documents.append(site_content)
 
         df = pd.DataFrame().from_records(documents)
 
         df.to_excel('data.xlsx')
+
+    
+x = Manage("Lodz", 5000, 8000, "all")
+
+x.scrap_olx()

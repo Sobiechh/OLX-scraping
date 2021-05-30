@@ -1,12 +1,12 @@
-from utils import txt_to_float
-
+from utils import Utils
 """
 Get content from otodom page
 """
 class OTODOMimporter:
-    def __init__(self, soup, url_link) -> None:
+    def __init__(self, soup, url_link):
         self.soup = soup
         self.url_link = url_link
+        self.utils = Utils()
 
     def get_offer_id(self):
         offer_id_desc = self.soup.find("div", {"class" : "css-jjerc6"})
@@ -16,7 +16,7 @@ class OTODOMimporter:
 
     def get_offer_surface(self):
         surface_txt = self.find("div", {"class" : "css-1ytkscc"})
-        surface = txt_to_float(surface_txt.text) if surface_txt else None
+        surface = self.utils.txt_to_float(surface_txt.text) if surface_txt else None
 
         return surface
 
@@ -38,7 +38,7 @@ class OTODOMimporter:
 
     def get_offer_price(self):
         price_txt = self.soup.find("strong", {"data-cy" : "adPageHeaderPrice"})
-        price = txt_to_float(price_txt.text)
+        price = self.utils.txt_to_float(price_txt.text)
 
         return price
 

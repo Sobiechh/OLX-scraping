@@ -1,4 +1,4 @@
-from utils import txt_to_float
+from utils import Utils
 
 """
 Get content from olx page
@@ -8,6 +8,7 @@ class OLXimporter:
     def __init__(self, soup, url_link):
         self.soup = soup
         self.url_link = url_link
+        self.utils = Utils()
 
     def get_bottom_bar(self):
         bottom_bar = self.soup.find(class_="css-1v2fuie")
@@ -25,11 +26,10 @@ class OLXimporter:
 
         return offer_details
     
-    @staticmethod
-    def get_offer_surface(details):
+    def get_offer_surface(self, details):
         details_items = details.find_all(class_="css-ox1ptj")
         surface_txt = details_items[-2].get_text().split(' ', 1)[-1]
-        surface = txt_to_float(surface_txt)
+        surface = self.utils.txt_to_float(surface_txt)
 
         return surface
 
@@ -51,7 +51,7 @@ class OLXimporter:
 
     def get_offer_price(self):
         price_txt = self.soup.find(class_="css-8kqr5l-Text").get_text()
-        price = txt_to_float(price_txt)
+        price = self.utils.txt_to_float(price_txt)
 
         return price
 

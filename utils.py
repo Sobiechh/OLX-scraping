@@ -8,31 +8,39 @@ LOGGER.setLevel(level=logging.WARNING)
 class Utils:
     def __init__(self):
         #headless option to chromedriver
-        chrome_options = Options()
-        chrome_options.add_argument("--headless")
-        chrome_options.add_argument('--log-level=3')
+        self.chrome_options = Options()
+        self.chrome_options.add_argument("--headless")
+        self.chrome_options.add_argument('--log-level=3')
 
         #webdriver get source
-        self.driver = webdriver.Chrome(chrome_options=chrome_options)
+        self.driver = webdriver.Chrome(chrome_options=self.chrome_options)
+
 
     def get_url_content(self, url_link, page_number=None, **filters):
         """
         Get source code frome page
         """
+        #headless option to chromedriver
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument('--log-level=3')
 
-        if page_number != None:
+        #webdriver get source
+        driver = webdriver.Chrome(chrome_options=chrome_options)
+
+        if page_number:
             url_link += f"?page={page_number}"
 
         for key, value in filters.items():
             url_link += self.get_search_filter(key, value)
         
 
-        self.driver.get(url_link)
+        driver.get(url_link)
         page_source = self.driver.page_source
 
 
         soup = BeautifulSoup(page_source, "html.parser")
-        self.driver.close()
+        driver.close()
 
         return soup, url_link
 
